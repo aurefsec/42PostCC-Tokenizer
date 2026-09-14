@@ -19,4 +19,4 @@ docs/
 .env.*
 !.env.example
 
-lib
+lib/

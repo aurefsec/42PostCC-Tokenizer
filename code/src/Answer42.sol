@@ -5,8 +5,8 @@ import {ERC20} from "../../lib/openzeppelin-contracts/contracts/token/ERC20/ERC2
 
 contract Answer42 is ERC20
 {
-  constructor () ERC20("Answer42", "ASR")
+  constructor (uint256 initialSupply) ERC20("Answer42", "ASR") // Answer42 inherits from ERC20 
   {
-
+    _mint(msg.sender, initialSupply); // The creator (msg.sender) of the contract will receive the initial supply
   }
 }

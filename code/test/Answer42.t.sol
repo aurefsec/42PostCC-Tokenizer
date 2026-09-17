@@ -36,9 +36,36 @@ contract Answer42Test is Test
   {
     asr.transfer(userAddr1, 100);
     asr.transfer(userAddr2, 100);
-
+    
+    // Check if the balance is correct after the two transfers
     assertEq(asr.balanceOf(address(this)), 800);
     assertEq(asr.balanceOf(address(userAddr1)), 100);
     assertEq(asr.balanceOf(address(userAddr2)), 100);
+  }
+
+  function testTransferOverflow() public
+  {
+    // vm = virtual machine to use cheated functions
+    vm.expectRevert();  // Call vm.expectRevert when i want the test to fail
+    asr.transfer(userAddr1, 1001);
+  }
+
+  function testTransferAfterApprove() public
+  {
+    asr.approve(userAddr1, 100);
+    vm.prank(userAddr1); // Call prank to allow userAddr1 to use the next function
+    asr.transferFrom(address(this), userAddr2, 100);
+
+    assertEq(asr.balanceOf(address(this)), 900);
+    assertEq(asr.balanceOf(address(userAddr1)), 0);
+    assertEq(asr.balanceOf(address(userAddr2)), 100);
+  }
+
+  function testTransferOverflowAfterApprove() public
+  {
+    asr.approve(userAddr1, 100);
+    vm.prank(userAddr1);
+    vm.expectRevert();
+    asr.transferFrom(address(this), userAddr2, 101);
   }
 }

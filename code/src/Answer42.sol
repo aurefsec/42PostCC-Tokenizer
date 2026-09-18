@@ -3,34 +3,71 @@ pragma solidity ^0.8.13;
 
 import {ERC20} from "../../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
-struct Proposal
-{
-  address proposer;
-  string action;
-  uint256 amount;
-}
-
 contract Answer42 is ERC20
 {
-  constructor (uint256 initialSupply) ERC20("Answer42", "ASR") // Answer42 inherits from ERC20 
+  enum Action
   {
-    _mint(msg.sender, initialSupply); // The creator (msg.sender) of the contract will receive the initial supply
+    MINT,
+    BURN
+  }
+
+  error InvalidAction();
+
+  struct Proposal
+  {
+    address proposer;
+    Action action;
+    uint256 amount;
+    uint256 signatureCount;
+    mapping (address => bool) signatureOwners;
   }
 
   uint256 indexProp = 0;
+  mapping (address => bool) owners; // To stoch each owners for multisig
   mapping(uint256 => Proposal) proposals; // Key => value like dict in python
 
-  proposeAction(address proposer, string action, uint256 amount) public returns bool
+  constructor (uint256 initialSupply, address owner1, address owner2, address owner3, address owner4) ERC20("Answer42", "ASR") // Answer42 inherits from ERC20 
   {
-    if (action != "mint" && action != "burn" && action != "changeOwner")
-      return false;
+    _mint(msg.sender, initialSupply); // The creator (msg.sender) of the contract will receive the initial supply
 
-    proposals[indexProp] = newProposal;
-    newProposal.proposer = proposer;
-    newProposal.action = action;
-    newProposal.amount = amount;
+    // Deployer and 4 more address will be owners
+    owners[msg.sender] = true;
+    owners[owner1] = true;
+    owners[owner2] = true;
+    owners[owner3] = true;
+    owners[owner4] = true;
+  }
+  
+  function proposeAction(address proposer, Action action, uint256 amount) public returns (uint256)
+  {
+    if (action != Action.MINT && action != Action.BURN)
+      revert InvalidAction(); // Revert to stop the function
+
+    proposals[indexProp].proposer = proposer;
+    proposals[indexProp].action = action;
+    proposals[indexProp].amount = amount;
+    proposals[indexProp].signatureCount = 0;
     indexProp += 1;
 
+    return indexProp;
+  }
+
+  function signProposal(uint256 id, address owner) public returns (bool)
+  {
+    if (!owners[owner])
+      return false;
+    if (proposals[id].signatureOwners[owner]) // Already signed
+      return false;
+
+    proposals[id].signatureOwners[owner] = true;
+    proposals[id].signatureCount += 1;
+    if (proposals[id].signatureCount == 5)
+    {
+      if (proposals[id].action == Action.MINT)
+        _mint(msg.sender, proposals[id].amount);
+      else if (proposals[id].action == Action.BURN)
+        _burn(msg.sender, proposals[id].amount);
+    }
     return true;
   }
 }

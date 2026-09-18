@@ -10,13 +10,17 @@ contract Answer42Test is Test
   Answer42 asr;
   uint256 initialSupply;
   address myAddr;
+  address owner1;
+  address owner2;
+  address owner3;
+  address owner4;
   address userAddr1;
   address userAddr2;
 
   function setUp() public
   {
     initialSupply = 1000;
-    asr = new Answer42(initialSupply);
+    asr = new Answer42(initialSupply, owner1, owner2, owner3, owner4);
     myAddr = address(this);
     userAddr1 = makeAddr("userAddr1");
     userAddr2 = makeAddr("userAddr2");
@@ -34,8 +38,8 @@ contract Answer42Test is Test
 
   function testTransfer() public
   {
-    asr.transfer(userAddr1, 100);
-    asr.transfer(userAddr2, 100);
+    require(asr.transfer(userAddr1, 100)); // Use require() to make sure the function returns true, else the function fails
+    require(asr.transfer(userAddr2, 100));
     
     // Check if the balance is correct after the two transfers
     assertEq(asr.balanceOf(address(this)), 800);
@@ -47,14 +51,14 @@ contract Answer42Test is Test
   {
     // vm = virtual machine to use cheated functions
     vm.expectRevert();  // Call vm.expectRevert when i want the test to fail
-    asr.transfer(userAddr1, 1001);
+    require(asr.transfer(userAddr1, 1001));
   }
 
   function testTransferAfterApprove() public
   {
-    asr.approve(userAddr1, 100);
+    require(asr.approve(userAddr1, 100)); 
     vm.prank(userAddr1); // Call prank to allow userAddr1 to use the next function
-    asr.transferFrom(address(this), userAddr2, 100);
+    require(asr.transferFrom(address(this), userAddr2, 100));
 
     assertEq(asr.balanceOf(address(this)), 900);
     assertEq(asr.balanceOf(address(userAddr1)), 0);
@@ -63,9 +67,9 @@ contract Answer42Test is Test
 
   function testTransferOverflowAfterApprove() public
   {
-    asr.approve(userAddr1, 100);
+    require(asr.approve(userAddr1, 100));
     vm.prank(userAddr1);
     vm.expectRevert();
-    asr.transferFrom(address(this), userAddr2, 101);
+    require(asr.transferFrom(address(this), userAddr2, 101));
   }
 }

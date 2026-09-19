@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13
-;
+pragma solidity ^0.8.13;
+
 import {Test} from "forge-std/Test.sol";
 import {Answer42} from "../src/Answer42.sol";
 
-contract Answer42Test is Test
+contract Answer42Basic is Test
 {
   // All the functions declares here can be used everywhere in the contract
   Answer42 asr;

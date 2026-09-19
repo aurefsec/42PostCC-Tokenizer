@@ -5,18 +5,18 @@ import {ERC20} from "../../lib/openzeppelin-contracts/contracts/token/ERC20/ERC2
 
 contract Answer42 is ERC20
 {
-  enum Action
-  {
-    MINT,
-    BURN
-  }
-
   error InvalidAction();
+  error NotAnOwner();
+  error AlreadySigned();
 
   struct Proposal
   {
+
+    uint8 public constant MINT = 0;
+    uint8 public constant BURN = 1;
+
     address proposer;
-    Action action;
+    uint8 action;
     uint256 amount;
     uint256 signatureCount;
     mapping (address => bool) signatureOwners;
@@ -38,9 +38,9 @@ contract Answer42 is ERC20
     owners[owner4] = true;
   }
   
-  function proposeAction(address proposer, Action action, uint256 amount) public returns (uint256)
+  function proposeAction(address proposer, uint8 action, uint256 amount) public returns (uint256)
   {
-    if (action != Action.MINT && action != Action.BURN)
+    if (action != MINT && action != BURN)
       revert InvalidAction(); // Revert to stop the function
 
     proposals[indexProp].proposer = proposer;
@@ -52,12 +52,12 @@ contract Answer42 is ERC20
     return indexProp;
   }
 
-  function signProposal(uint256 id, address owner) public returns (bool)
+  function signProposal(uint256 id, address owner) public
   {
     if (!owners[owner])
-      return false;
-    if (proposals[id].signatureOwners[owner]) // Already signed
-      return false;
+      revert NotAnOwner();
+    if (proposals[id].signatureOwners[owner])
+      revert AlreadySigned();
 
     proposals[id].signatureOwners[owner] = true;
     proposals[id].signatureCount += 1;
@@ -68,6 +68,5 @@ contract Answer42 is ERC20
       else if (proposals[id].action == Action.BURN)
         _burn(msg.sender, proposals[id].amount);
     }
-    return true;
   }
 }

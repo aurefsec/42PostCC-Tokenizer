@@ -20,7 +20,7 @@ contract Answer42Basic is Test
   function setUp() public
   {
     initialSupply = 1000;
-    asr = new Answer42(initialSupply, owner1, owner2, owner3, owner4);
+    asr = new Answer42(initialSupply, msg.sender, owner1, owner2, owner3, owner4);
     myAddr = address(this);
     userAddr1 = makeAddr("userAddr1");
     userAddr2 = makeAddr("userAddr2");

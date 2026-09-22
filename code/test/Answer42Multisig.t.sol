@@ -47,7 +47,6 @@ contract Answer42Multisig is Test
     asr.signProposal(indexProp, owner4);
     assertEq(asr.balanceOf(deployer), 1000);
     asr.signProposal(indexProp, owner5);
-    console.log("deployer2: ", deployer);
     assertEq(asr.balanceOf(deployer), 2000);
   }
 }

@@ -65,13 +65,9 @@ contract Answer42 is ERC20
       revert AlreadySigned();
 
     proposals[id].signatureOwners[owner] = true;
-    console.log("before signatureCount: ", proposals[id].signatureCount);
     proposals[id].signatureCount += 1;
-    console.log("id: ", id);
-    console.log("signatureCount: ", proposals[id].signatureCount);
     if (proposals[id].signatureCount == 5)
     {
-      console.log("deployer1: ", deployer);
       if (proposals[id].action == MINT)
         _mint(deployer, proposals[id].amount);
       else if (proposals[id].action == BURN)

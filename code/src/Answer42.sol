@@ -24,19 +24,21 @@ contract Answer42 is ERC20
   }
 
   uint256 indexProp = 1;
-  mapping (address => bool) owners; // To stoch each owners for multisig
+  address deployer; // The creator of the contract
+  mapping (address => bool) isOwners; // To check if address in an owner
   mapping(uint256 => Proposal) proposals; // Key => value like dict in python
 
   constructor (uint256 initialSupply, address owner1, address owner2, address owner3, address owner4, address owner5) ERC20("Answer42", "ASR") // Answer42 inherits from ERC20 
   {
-    _mint(owner1, initialSupply); // The creator (msg.sender) of the contract will receive the initial supply
+    _mint(owner1, initialSupply); // The creator (deployer) of the contract will receive the initial supply
 
     // Deployer and 4 more address will be owners
-    owners[owner1] = true;
-    owners[owner2] = true;
-    owners[owner3] = true;
-    owners[owner4] = true;
-    owners[owner5] = true;
+    deployer = owner1;
+    isOwners[owner1] = true;
+    isOwners[owner2] = true;
+    isOwners[owner3] = true;
+    isOwners[owner4] = true;
+    isOwners[owner5] = true;
   }
   
   function proposeAction(address proposer, uint8 action, uint256 amount) public returns (uint256)
@@ -55,7 +57,7 @@ contract Answer42 is ERC20
 
   function signProposal(uint256 id, address owner) public
   {
-    if (!owners[owner])
+    if (!isOwners[owner])
       revert NotAnOwner();
     if (proposals[id].proposer == address(0))
       revert InvalidId();
@@ -69,10 +71,11 @@ contract Answer42 is ERC20
     console.log("signatureCount: ", proposals[id].signatureCount);
     if (proposals[id].signatureCount == 5)
     {
+      console.log("deployer1: ", deployer);
       if (proposals[id].action == MINT)
-        _mint(msg.sender, proposals[id].amount);
+        _mint(deployer, proposals[id].amount);
       else if (proposals[id].action == BURN)
-        _burn(msg.sender, proposals[id].amount);
+        _burn(deployer, proposals[id].amount);
     }
   }
 }

@@ -9,19 +9,23 @@ contract Answer42Basic is Test
   // All the functions declares here can be used everywhere in the contract
   Answer42 asr;
   uint256 initialSupply;
-  address myAddr;
-  address owner1;
+  address deployer;
   address owner2;
   address owner3;
   address owner4;
+  address owner5;
   address userAddr1;
   address userAddr2;
 
   function setUp() public
   {
     initialSupply = 1000;
-    asr = new Answer42(initialSupply, msg.sender, owner1, owner2, owner3, owner4);
-    myAddr = address(this);
+    deployer = makeAddr("deployer");
+    owner2 = makeAddr("owner2");
+    owner3 = makeAddr("owner3");
+    owner4 = makeAddr("owner4");
+    owner5 = makeAddr("owner5");
+    asr = new Answer42(initialSupply, deployer, owner2, owner3, owner4, owner5);
     userAddr1 = makeAddr("userAddr1");
     userAddr2 = makeAddr("userAddr2");
   }
@@ -33,43 +37,48 @@ contract Answer42Basic is Test
     assertEq(asr.name(), "Answer42");
     assertEq(asr.symbol(), "ASR");
     assertEq(asr.totalSupply(), initialSupply);
-    assertEq(asr.balanceOf(address(this)), initialSupply);
+    assertEq(asr.balanceOf(address(deployer)), initialSupply);
   }
 
   function testTransfer() public
   {
+    // vm = virtual machine to use cheated functions
+    vm.prank(deployer); // Call prank to allow userAddr1 to use the next function
     require(asr.transfer(userAddr1, 100)); // Use require() to make sure the function returns true, else the function fails
+    vm.prank(deployer);
     require(asr.transfer(userAddr2, 100));
     
     // Check if the balance is correct after the two transfers
-    assertEq(asr.balanceOf(address(this)), 800);
+    assertEq(asr.balanceOf(address(deployer)), 800);
     assertEq(asr.balanceOf(address(userAddr1)), 100);
     assertEq(asr.balanceOf(address(userAddr2)), 100);
   }
 
   function testTransferOverflow() public
   {
-    // vm = virtual machine to use cheated functions
+    vm.prank(deployer);
     vm.expectRevert();  // Call vm.expectRevert when i want the test to fail
-    require(asr.transfer(userAddr1, 1001));
+    asr.transfer(userAddr1, 1001);
   }
 
   function testTransferAfterApprove() public
   {
+    vm.prank(deployer);
     require(asr.approve(userAddr1, 100)); 
-    vm.prank(userAddr1); // Call prank to allow userAddr1 to use the next function
-    require(asr.transferFrom(address(this), userAddr2, 100));
+    vm.prank(userAddr1); 
+    require(asr.transferFrom(address(deployer), userAddr2, 100));
 
-    assertEq(asr.balanceOf(address(this)), 900);
+    assertEq(asr.balanceOf(address(deployer)), 900);
     assertEq(asr.balanceOf(address(userAddr1)), 0);
     assertEq(asr.balanceOf(address(userAddr2)), 100);
   }
 
   function testTransferOverflowAfterApprove() public
   {
+    vm.prank(deployer);
     require(asr.approve(userAddr1, 100));
     vm.prank(userAddr1);
     vm.expectRevert();
-    require(asr.transferFrom(address(this), userAddr2, 101));
+    asr.transferFrom(address(deployer), userAddr2, 101);
   }
 }

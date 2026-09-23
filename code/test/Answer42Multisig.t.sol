@@ -30,7 +30,7 @@ contract Answer42Multisig is Test
 
   function testMint() public
   {
-    uint256 indexProp = 1000;
+    uint256 indexProp;
 
     vm.expectRevert();
     indexProp = asr.proposeAction(userAddr1, 2, 1000);
@@ -48,5 +48,22 @@ contract Answer42Multisig is Test
     assertEq(asr.balanceOf(deployer), 1000);
     asr.signProposal(indexProp, owner5);
     assertEq(asr.balanceOf(deployer), 2000);
+  }
+
+  function testBurn() public
+  {
+    uint256 indexProp;
+
+    indexProp = asr.proposeAction(userAddr1, 1, 1000);
+    asr.signProposal(indexProp, deployer);
+    assertEq(asr.balanceOf(deployer), 1000);
+    asr.signProposal(indexProp, owner2);
+    assertEq(asr.balanceOf(deployer), 1000);
+    asr.signProposal(indexProp, owner3);
+    assertEq(asr.balanceOf(deployer), 1000);
+    asr.signProposal(indexProp, owner4);
+    assertEq(asr.balanceOf(deployer), 1000);
+    asr.signProposal(indexProp, owner5);
+    assertEq(asr.balanceOf(deployer), 0);
   }
 }

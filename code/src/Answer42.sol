@@ -74,4 +74,14 @@ contract Answer42 is ERC20
         _burn(deployer, proposals[id].amount);
     }
   }
+
+  // Rewrite the parent transfer function from ERC20 using the keyword override
+  function transfer(address to, uint256 amount) public override returns (bool)
+  {
+    if (amount >= 1000)
+    {
+      // Learning Yul
+    }
+    return super.transfer(to, amount)
+  }
 }

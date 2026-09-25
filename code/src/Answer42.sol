@@ -80,7 +80,18 @@ contract Answer42 is ERC20
   {
     if (amount >= 1000)
     {
-      // Learning Yul
+      assembly
+      {
+        mstore(0, indexProp.slot);
+        mstore(0x20, proposals.slot);
+
+        // Slot size : 32 bytes (256 bits)
+        // Struct Proposal size : 20 + 8 + 256 + 256 + x bits;
+        let data1 := sload(proposals.slot); // 20 + 8
+        let data2 := sload(proposals.slot + 1); // 256
+        let data3 := sload(proposals.slot + 2); // 256
+      }
+      return true;
     }
     return super.transfer(to, amount)
   }

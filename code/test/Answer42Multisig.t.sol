@@ -18,7 +18,7 @@ contract Answer42Multisig is Test
 
   function setUp() public
   {
-    initialSupply = 1000;
+    initialSupply = 2000;
     deployer = makeAddr("deployer");
     owner2 = makeAddr("owner2");
     owner3 = makeAddr("owner3");
@@ -39,15 +39,15 @@ contract Answer42Multisig is Test
     vm.expectRevert();
     asr.signProposal(indexProp, userAddr1);
     asr.signProposal(indexProp, deployer);
-    assertEq(asr.balanceOf(deployer), 1000);
-    asr.signProposal(indexProp, owner2);
-    assertEq(asr.balanceOf(deployer), 1000);
-    asr.signProposal(indexProp, owner3);
-    assertEq(asr.balanceOf(deployer), 1000);
-    asr.signProposal(indexProp, owner4);
-    assertEq(asr.balanceOf(deployer), 1000);
-    asr.signProposal(indexProp, owner5);
     assertEq(asr.balanceOf(deployer), 2000);
+    asr.signProposal(indexProp, owner2);
+    assertEq(asr.balanceOf(deployer), 2000);
+    asr.signProposal(indexProp, owner3);
+    assertEq(asr.balanceOf(deployer), 2000);
+    asr.signProposal(indexProp, owner4);
+    assertEq(asr.balanceOf(deployer), 2000);
+    asr.signProposal(indexProp, owner5);
+    assertEq(asr.balanceOf(deployer), 3000);
   }
 
   function testBurn() public
@@ -56,14 +56,40 @@ contract Answer42Multisig is Test
 
     indexProp = asr.proposeAction(userAddr1, 1, 1000);
     asr.signProposal(indexProp, deployer);
-    assertEq(asr.balanceOf(deployer), 1000);
+    assertEq(asr.balanceOf(deployer), 2000);
     asr.signProposal(indexProp, owner2);
-    assertEq(asr.balanceOf(deployer), 1000);
+    assertEq(asr.balanceOf(deployer), 2000);
     asr.signProposal(indexProp, owner3);
-    assertEq(asr.balanceOf(deployer), 1000);
+    assertEq(asr.balanceOf(deployer), 2000);
     asr.signProposal(indexProp, owner4);
-    assertEq(asr.balanceOf(deployer), 1000);
+    assertEq(asr.balanceOf(deployer), 2000);
     asr.signProposal(indexProp, owner5);
-    assertEq(asr.balanceOf(deployer), 0);
+    assertEq(asr.balanceOf(deployer), 1000);
+  }
+
+  function testTransfer() public
+  {
+    vm.prank(deployer);
+    asr.transfer(address(userAddr1), 500);
+    vm.prank(deployer);
+    asr.transfer(address(userAddr1), 500);
+    vm.prank(deployer);
+    asr.transfer(address(userAddr1), 500);
+    assertEq(asr.balanceOf(userAddr1), 1500);
+
+    vm.prank(userAddr1);
+    asr.transfer(address(deployer), 1500);
+    assertEq(asr.balanceOf(deployer), 500);
+
+    asr.signProposal(1, deployer);
+    assertEq(asr.balanceOf(deployer), 500);
+    asr.signProposal(1, owner2);
+    assertEq(asr.balanceOf(deployer), 500);
+    asr.signProposal(1, owner3);
+    assertEq(asr.balanceOf(deployer), 500);
+    asr.signProposal(1, owner4);
+    assertEq(asr.balanceOf(deployer), 500);
+    asr.signProposal(1, owner5);
+    assertEq(asr.balanceOf(deployer), 2000);
   }
 }

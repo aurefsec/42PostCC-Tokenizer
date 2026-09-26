@@ -57,8 +57,10 @@ contract Answer42Basic is Test
   function testTransferOverflow() public
   {
     vm.prank(deployer);
+    asr.transfer(userAddr1, 200);
+    vm.prank(deployer);
     vm.expectRevert();  // Call vm.expectRevert when i want the test to fail
-    asr.transfer(userAddr1, 1001);
+    asr.transfer(userAddr1, 801);
   }
 
   function testTransferAfterApprove() public

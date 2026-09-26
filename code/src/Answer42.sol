@@ -13,10 +13,12 @@ contract Answer42 is ERC20
 
   uint8 public constant MINT = 0;
   uint8 public constant BURN = 1;
+  uint8 public constant TRANSACTION = 2;
 
   struct Proposal
   { 
     address proposer;
+    address receiver;
     uint8 action;
     uint256 amount;
     uint256 signatureCount;
@@ -31,6 +33,13 @@ contract Answer42 is ERC20
   constructor (uint256 initialSupply, address owner1, address owner2, address owner3, address owner4, address owner5) ERC20("Answer42", "ASR") // Answer42 inherits from ERC20 
   {
     _mint(owner1, initialSupply); // The creator (deployer) of the contract will receive the initial supply
+
+    // Check if owners are valid address
+    require(owner1 != address(0));
+    require(owner2 != address(0));
+    require(owner3 != address(0));
+    require(owner4 != address(0));
+    require(owner5 != address(0));
 
     // Deployer and 4 more address will be owners
     deployer = owner1;
@@ -49,7 +58,6 @@ contract Answer42 is ERC20
     proposals[indexProp].proposer = proposer;
     proposals[indexProp].action = action;
     proposals[indexProp].amount = amount;
-    proposals[indexProp].signatureCount = 0;
     indexProp += 1;
 
     return indexProp - 1;
@@ -72,6 +80,8 @@ contract Answer42 is ERC20
         _mint(deployer, proposals[id].amount);
       else if (proposals[id].action == BURN)
         _burn(deployer, proposals[id].amount);
+      else if (proposals[id].action == TRANSACTION)
+        _transfer(proposals[id].proposer, proposals[id].receiver, proposals[id].amount);
     }
   }
 
@@ -82,17 +92,23 @@ contract Answer42 is ERC20
     {
       assembly
       {
-        mstore(0, indexProp.slot);
-        mstore(0x20, proposals.slot);
+        // Slot size: 32 bytes (256 bits)
+        // Retrieve indexProp and proposals to generate key
+        mstore(0, sload(indexProp.slot)) // mstore: temporary storage to calcul the key, sload(): read the value
+        mstore(0x20, proposals.slot) // 0x20: 32 in hexadecimal (for one slot);
+        let key := keccak256(0, 0x40)
+  
+        // Struct Proposal size :slot 0: 20, slot 1: 20 + 8, slot 2: 256, slot 3: 256, slot4+: x bits;
+        // sstore(): permanent storage to store value of mapping proposals
+        sstore(key, caller()) // caller(), the function caller
+        sstore(add(key, 1), add(to, shl(160, 2))) // shl(): bytes shit of x bits to the left
+        sstore(add(key, 2), amount)
 
-        // Slot size : 32 bytes (256 bits)
-        // Struct Proposal size : 20 + 8 + 256 + 256 + x bits;
-        let data1 := sload(proposals.slot); // 20 + 8
-        let data2 := sload(proposals.slot + 1); // 256
-        let data3 := sload(proposals.slot + 2); // 256
+        // Increment indexProp
+        sstore(indexProp.slot, add(sload(indexProp.slot), 1))
       }
       return true;
     }
-    return super.transfer(to, amount)
+    return super.transfer(to, amount);
   }
 }

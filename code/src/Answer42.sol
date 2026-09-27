@@ -85,30 +85,46 @@ contract Answer42 is ERC20
     }
   }
 
-  // Rewrite the parent transfer function from ERC20 using the keyword override
+  function transferAmountTooBig(address to, uint256 amount) private
+  {
+    assembly
+    {
+      // Slot size: 32 bytes (256 bits)
+      // Retrieve indexProp and proposals to generate key
+      mstore(0, sload(indexProp.slot)) // mstore: temporary storage to calcul the key, sload(): read the value
+      mstore(0x20, proposals.slot) // 0x20: 32 in hexadecimal (for one slot);
+      let key := keccak256(0, 0x40)
+  
+      // Struct Proposal size :slot 0: 20, slot 1: 20 + 8, slot 2: 256, slot 3: 256, slot4+: x bits;
+      // sstore(): permanent storage to store value of mapping proposals
+      sstore(key, caller()) // caller(), the function caller
+      sstore(add(key, 1), add(to, shl(160, 2))) // shl(): bytes shit of x bits to the left
+      sstore(add(key, 2), amount)
+
+      // Increment indexProp
+      sstore(indexProp.slot, add(sload(indexProp.slot), 1))
+    }
+  }
+
+  // Rewrite the parent transfer() and transferFrom() function from ERC20 using the keyword override
   function transfer(address to, uint256 amount) public override returns (bool)
   {
     if (amount >= 1000)
     {
-      assembly
-      {
-        // Slot size: 32 bytes (256 bits)
-        // Retrieve indexProp and proposals to generate key
-        mstore(0, sload(indexProp.slot)) // mstore: temporary storage to calcul the key, sload(): read the value
-        mstore(0x20, proposals.slot) // 0x20: 32 in hexadecimal (for one slot);
-        let key := keccak256(0, 0x40)
-  
-        // Struct Proposal size :slot 0: 20, slot 1: 20 + 8, slot 2: 256, slot 3: 256, slot4+: x bits;
-        // sstore(): permanent storage to store value of mapping proposals
-        sstore(key, caller()) // caller(), the function caller
-        sstore(add(key, 1), add(to, shl(160, 2))) // shl(): bytes shit of x bits to the left
-        sstore(add(key, 2), amount)
-
-        // Increment indexProp
-        sstore(indexProp.slot, add(sload(indexProp.slot), 1))
-      }
+      transferAmountTooBig(to, amount);
       return true;
     }
     return super.transfer(to, amount);
+  
+  }
+
+  function transferFrom(address from, address to, uint256 amount) public override returns (bool)
+  {
+    if (amount >= 1000)
+    {
+      transferAmountTooBig(to, amount);
+      return true;
+    }
+    return super.transferFrom(from, to, amount);
   }
 }

@@ -114,17 +114,6 @@ contract Answer42 is ERC20
       transferAmountTooBig(to, amount);
       return true;
     }
-    return super.transfer(to, amount);
-  
+    return super.transfer(to, amount); 
   }
-
-  function transferFrom(address from, address to, uint256 amount) public override returns (bool)
-  {
-    if (amount >= 1000)
-    {
-      transferAmountTooBig(to, amount);
-      return true;
-    }
-    return super.transferFrom(from, to, amount);
-  }
-}
+ }

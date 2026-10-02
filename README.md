@@ -23,10 +23,10 @@ To have more informations of the different features I recommend checking the "do
 
 ## 4. Deployment
 
-Contract address : 0xd6e7624DbBEB3CC33B75Cfaafa4ecDD62b7c1cfc
-Network : Sepolia via Infura
-Transaction hash : 0x7f1524b73c5240af131ce575425444dda720842f464b0e795f05ef06a5c24d96
-Etherscan URL : https://sepolia.etherscan.io/address/0xd6e7624DbBEB3CC33B75Cfaafa4ecDD62b7c1cfc
+- Contract address : 0xd6e7624DbBEB3CC33B75Cfaafa4ecDD62b7c1cfc
+- Network : Sepolia via Infura
+- Transaction hash : 0x7f1524b73c5240af131ce575425444dda720842f464b0e795f05ef06a5c24d96
+- Etherscan URL : https://sepolia.etherscan.io/address/0xd6e7624DbBEB3CC33B75Cfaafa4ecDD62b7c1cfc
 
 ## 5. Installation/Use
 

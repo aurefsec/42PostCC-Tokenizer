@@ -10,7 +10,8 @@ number 42 is the answer of the universe.
 
 ## 2. Technical choices
 
-- Blockchain : Ethereum Sepolia (The project asks to use testnet to avoid using real money)
+- Blockchain : Ethereum Sepolia (The project asks to use testnet to avoid using real money and 
+Sepolia is the most used)
 - Langage : Solidity + Yul (Use of Yul is my personal choice to learn a little bit of low level)
 - Framework : Foundry (This is the most used and efficient Framework actually)
 

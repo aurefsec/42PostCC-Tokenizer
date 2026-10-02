@@ -4,7 +4,7 @@
 
 The goal of this project is to create a Token on the blockchain of my choice. I chose to code my 
 own token on Ethereum blockchain because this is the most used. The name of my token is "Answer42" 
-with the tag "ASR" because it's a project for the 42 School and the project asks to user "42" in 
+with the tag "ASR" because it's a project for the 42 School and the project asks to use "42" in 
 the name. I used the word "Answer" because it references to "The Hitchhiker's Guide to the 
 Galaxy" where the number 42 is the answer of the universe.
 

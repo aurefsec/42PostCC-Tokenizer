@@ -21,6 +21,7 @@ Galaxy" where the number 42 is the answer of the universe.
 - Protected transaction
 - Mint/Burn functions
 - Yul optimization
+
 To have more informations of the different features I recommend checking the "documentation" folder.
 
 ## 4. Deployment

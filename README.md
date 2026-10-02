@@ -1,4 +1,6 @@
-## 1. Title + Short description
+# Tokenizer
+
+## 1. Short description + Token name
 
 The goal of this project is to create a Token on the blockchain of my choice. I chose to code my 
 own token on Ethereum blockchain because this is the most used. The name of my token is "Answer42" 
@@ -23,6 +25,7 @@ To have more informations of the different features I recommend checking the "do
 
 ## 4. Deployment
 
+- Creator address : 0xd0A7cC972Ba8D0A759D2480CE05E712d7c536Ea1
 - Contract address : 0xd6e7624DbBEB3CC33B75Cfaafa4ecDD62b7c1cfc
 - Network : Sepolia via Infura
 - Transaction hash : 0x7f1524b73c5240af131ce575425444dda720842f464b0e795f05ef06a5c24d96
